@@ -1,0 +1,5 @@
+#!/bin/bash
+ssh-knock-interceptor() {
+    eval `python3 $HOME/.ssh-knock-interceptor/main.py ${1}`
+}
+
