@@ -9,6 +9,12 @@ Make jumphosts and knock easier without messing up your ssh config.
 Maintaining knock commands in your ssh config becomes a huge mess over time.
 
 
+## Requirements
+
+- Python 3.6+
+- knockd
+- bash
+
 ## Setup
 
 1. Clone the repo in your home folder:
