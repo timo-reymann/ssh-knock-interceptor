@@ -17,9 +17,10 @@ class PortKnocker:
         print(f"export {var}='{val}';")
 
     def knock(self):
-        last_index = len(self.config_entry.sequence) - 1
-        for i, port in enumerate(self.config_entry.sequence):
-            use_udp = self.config_entry.use_udp
+        ports = self.config_entry.sequence.split(" ")
+        last_index = len(ports) - 1
+        for i, port in enumerate(ports):
+            use_udp = self.config_entry.use_udp == "yes"
             if port.find(':') != -1:
                 port, protocol = port.split(':', 2)
                 if protocol == 'tcp':
@@ -31,25 +32,21 @@ class PortKnocker:
                     raise ValueError(error.format(protocol))
 
 
-            print('hitting %s %s:%d' % ('udp' if use_udp else 'tcp', self.ip_address, int(port)))
+            # print('hitting %s %s:%d' % ('udp' if use_udp else 'tcp', self.config_entry.knock_host, int(port)))
 
             s = socket.socket(self.address_family, socket.SOCK_DGRAM if use_udp else socket.SOCK_STREAM)
             s.setblocking(False)
 
-            socket_address = (self.ip_address, int(port))
+            socket_address = (self.config_entry.knock_host, int(port))
             if use_udp:
                 s.sendto(b'', socket_address)
             else:
                 s.connect_ex(socket_address)
-                select.select([s], [s], [s], self.config_entry.duration)
+                select.select([s], [s], [s], 1)
 
             s.close()
 
             if self.config_entry.duration and i != last_index:
-                time.sleep(self.config_entry.duration)
+                time.sleep(self.config_entry.duration / 1000)
 
         self.print_env("KNOCK_HOST", self.config_entry.knock_host)
-        knock_cmd = f"knock {self.config_entry.knock_host} {self.config_entry.sequence}" \
-                    f" -d {self.config_entry.duration}" \
-                    f" {'-u' if self.config_entry.use_udp == 'yes' else ''}"
-        print(knock_cmd)
