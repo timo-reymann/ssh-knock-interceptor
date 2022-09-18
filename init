@@ -1,5 +1,17 @@
 #!/bin/bash
+
 ssh-knock-interceptor() {
     eval `python3 $HOME/.ssh-knock-interceptor/main.py ${1}`
 }
 
+# if the script is sourced with parameter execute immediately
+if [ ! -z "$1" ]
+then
+  ssh-knock-interceptor "$1"
+
+  # also if port is given -> already connect
+  if [ ! -z "$2" ]
+  then
+    ssh ${KNOCK_HOST} -W "$1:$2"
+  fi
+fi
